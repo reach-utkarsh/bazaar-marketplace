@@ -1,0 +1,345 @@
+// Multi-vendor marketplace schema.
+// Money is stored as integer minor units (paise). See PLAN.md / DECISIONS.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  VENDOR
+  ADMIN
+}
+
+enum VendorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum SubOrderStatus {
+  PLACED
+  PACKED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentProvider {
+  RAZORPAY
+  MOCK
+}
+
+enum PaymentRecordStatus {
+  CREATED
+  CAPTURED
+  FAILED
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+}
+
+enum RefundStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  vendor         Vendor?
+  refreshTokens  RefreshToken[]
+  cartItems      CartItem[]
+  orders         Order[]
+  reviews        Review[]
+  refundRequests RefundRequest[]
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  familyId  String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+model Vendor {
+  id              String       @id @default(cuid())
+  userId          String       @unique
+  storeName       String       @unique
+  slug            String       @unique
+  description     String
+  status          VendorStatus @default(PENDING)
+  rejectionReason String?
+  approvedAt      DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products  Product[]
+  subOrders SubOrder[]
+  payouts   Payout[]
+
+  @@index([status])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  products Product[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  vendorId    String
+  categoryId  String
+  title       String
+  slug        String   @unique
+  description String
+  price       Int
+  stock       Int
+  isActive    Boolean  @default(true)
+  avgRating   Float    @default(0)
+  reviewCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  vendor     Vendor         @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  category   Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images     ProductImage[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  @@index([vendorId])
+  @@index([categoryId])
+  @@index([price])
+  @@index([createdAt])
+}
+
+model ProductImage {
+  id         String   @id @default(cuid())
+  productId  String
+  url        String
+  storageKey String?
+  position   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id                 String        @id @default(cuid())
+  customerId         String
+  paymentStatus      PaymentStatus @default(PENDING)
+  totalAmount        Int
+  currency           String        @default("INR")
+  shippingName       String
+  shippingPhone      String
+  shippingLine1      String
+  shippingLine2      String?
+  shippingCity       String
+  shippingState      String
+  shippingPostalCode String
+  shippingCountry    String        @default("India")
+  paidAt             DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  customer  User       @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  subOrders SubOrder[]
+  payment   Payment?
+
+  @@index([customerId])
+  @@index([paymentStatus, createdAt])
+}
+
+model SubOrder {
+  id                String         @id @default(cuid())
+  orderId           String
+  vendorId          String
+  status            SubOrderStatus @default(PLACED)
+  subtotal          Int
+  commissionRateBps Int
+  commissionAmount  Int
+  vendorEarnings    Int
+  trackingNumber    String?
+  carrier           String?
+  cancelReason      String?
+  refundedAmount    Int            @default(0)
+  payoutId          String?
+  packedAt          DateTime?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  order          Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  vendor         Vendor          @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  payout         Payout?         @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  items          OrderItem[]
+  events         SubOrderEvent[]
+  refundRequests RefundRequest[]
+
+  @@index([orderId])
+  @@index([vendorId, status])
+  @@index([payoutId])
+}
+
+model SubOrderEvent {
+  id         String         @id @default(cuid())
+  subOrderId String
+  status     SubOrderStatus
+  note       String?
+  createdAt  DateTime       @default(now())
+
+  subOrder SubOrder @relation(fields: [subOrderId], references: [id], onDelete: Cascade)
+
+  @@index([subOrderId])
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  subOrderId   String
+  productId    String
+  productTitle String
+  imageUrl     String?
+  unitPrice    Int
+  quantity     Int
+  lineTotal    Int
+
+  subOrder SubOrder @relation(fields: [subOrderId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([subOrderId])
+  @@index([productId])
+}
+
+model Payment {
+  id                String              @id @default(cuid())
+  orderId           String              @unique
+  provider          PaymentProvider
+  providerOrderId   String              @unique
+  providerPaymentId String?
+  status            PaymentRecordStatus @default(CREATED)
+  amount            Int
+  currency          String              @default("INR")
+  failureReason     String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model WebhookEvent {
+  id          String          @id @default(cuid())
+  provider    PaymentProvider
+  eventId     String          @unique
+  type        String
+  payload     Json
+  processedAt DateTime        @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  userId    String
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
+  @@index([productId, createdAt])
+}
+
+model Payout {
+  id        String       @id @default(cuid())
+  vendorId  String
+  amount    Int
+  status    PayoutStatus @default(PENDING)
+  reference String?
+  createdAt DateTime     @default(now())
+  paidAt    DateTime?
+
+  vendor    Vendor     @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  subOrders SubOrder[]
+
+  @@index([vendorId, status])
+}
+
+model RefundRequest {
+  id               String       @id @default(cuid())
+  subOrderId       String
+  customerId       String
+  reason           String
+  amount           Int
+  status           RefundStatus @default(REQUESTED)
+  adminNote        String?
+  providerRefundId String?
+  createdAt        DateTime     @default(now())
+  resolvedAt       DateTime?
+
+  subOrder SubOrder @relation(fields: [subOrderId], references: [id], onDelete: Cascade)
+  customer User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([subOrderId])
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

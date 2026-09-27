@@ -14,5 +14,18 @@ export const addressSchema = z.object({
   shippingCountry: text(2, 60).default('India'),
 });
 
+const subOrderParams = z.object({ id: z.string().min(1).max(64), subOrderId: z.string().min(1).max(64) });
+
 export const checkoutSchema = requestSchema({ body: z.object({ address: addressSchema }) });
 export const orderIdSchema = requestSchema({ params: idParam });
+export const listOrdersSchema = requestSchema({
+  query: z.object({ page: z.coerce.number().int().min(1).default(1), limit: z.coerce.number().int().min(1).max(50).default(10) }),
+});
+export const cancelSubOrderSchema = requestSchema({
+  params: subOrderParams,
+  body: z.object({ reason: z.string().trim().max(500).optional() }),
+});
+export const refundRequestSchema = requestSchema({
+  params: subOrderParams,
+  body: z.object({ reason: z.string().trim().min(10, 'Please describe the problem (10+ characters)').max(500) }),
+});

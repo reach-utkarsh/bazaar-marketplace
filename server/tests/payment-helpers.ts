@@ -24,3 +24,22 @@ export async function payAndVerify(auth: Record<string, string>, orderId: string
     orderId, providerOrderId, providerPaymentId: paymentId, signature: paymentSignature(providerOrderId, paymentId),
   });
 }
+
+import { addToCart, checkout, createProduct, createUser, createVendor } from './helpers.js';
+
+/** Customer buys products (one line each) and pays; returns the paid order. */
+export async function paidOrder(lines: { productId: string; quantity?: number }[], customer?: Awaited<ReturnType<typeof createUser>>) {
+  const c = customer ?? (await createUser());
+  for (const l of lines) await addToCart(c.auth, l.productId, l.quantity ?? 1);
+  const res = await checkout(c.auth);
+  if (res.status !== 201) throw new Error(`checkout failed ${res.status} ${JSON.stringify(res.body)}`);
+  const v = await payAndVerify(c.auth, res.body.order.id, res.body.payment.providerOrderId, `pay_${Math.random().toString(36).slice(2)}`);
+  if (v.status !== 200) throw new Error('payment failed');
+  return { customer: c, order: res.body.order as { id: string; subOrders: { id: string; vendorId: string; subtotal: number }[] } };
+}
+
+export async function vendorWithProduct(data: { price?: number; stock?: number } = {}) {
+  const v = await createVendor();
+  const product = await createProduct(v.vendor.id, data);
+  return { ...v, product };
+}

@@ -256,11 +256,11 @@ Every endpoint validates `params`/`query`/`body` with Zod.
 - [x] Tests (signature, webhook idempotency, checkout)
 
 ### Phase 4 — Orders, sub-orders & inventory
-- [ ] Customer order history + detail with per-sub-order tracking timeline
-- [ ] Vendor order list + status transitions (state machine)
-- [ ] Cancellation restores stock (+ auto-refund if paid)
-- [ ] Concurrency test: two buyers, last unit
-- [ ] Tests
+- [x] Customer order history + detail with per-sub-order tracking timeline
+- [x] Vendor order list + status transitions (state machine)
+- [x] Cancellation restores stock (+ auto-refund if paid)
+- [x] Concurrency test: two buyers, last unit
+- [x] Tests
 
 ### Phase 5 — Admin, commission & payouts
 - [ ] Admin: vendor approval, categories, all orders, commission setting

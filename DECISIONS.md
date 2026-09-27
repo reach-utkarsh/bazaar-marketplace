@@ -126,3 +126,30 @@ Newest entries are appended at the bottom of each section.
 35. **Shipping is free and there is no tax line** — out of scope for the demo.
 36. **Webhook endpoint is `/api/payments/webhook`** (configure this URL in the Razorpay
     dashboard with the `payment.captured`, `payment.failed` and `order.paid` events).
+
+## Orders & inventory
+
+37. **Inventory safety = conditional atomic UPDATE + DB constraint.** Stock is reserved
+    with `UPDATE "Product" SET stock = stock - $q WHERE id = $id AND stock >= $q` inside
+    the checkout transaction. Postgres row-locks the product for the UPDATE, and a
+    concurrent transaction re-evaluates `stock >= $q` against the committed row once the
+    lock is released (READ COMMITTED), so the last unit can only be sold once. Lines are
+    locked in `productId` order to avoid deadlocks. A `CHECK (stock >= 0)` constraint
+    backs this up. This avoids `SERIALIZABLE` retries and explicit `SELECT … FOR UPDATE`
+    round-trips while giving the same guarantee.
+38. **The concurrency test was mutation-tested:** replacing the conditional UPDATE with a
+    naive read-check-write makes 3 of the 4 inventory tests fail (overselling), and they
+    pass with the real implementation.
+39. **Sub-order state machine** lives in one place (`TRANSITIONS`) and every transition is
+    a compare-and-swap on the current status. `CANCELLED` is only reachable from
+    `PLACED`/`PACKED`; shipping requires a tracking number.
+40. **Vendors only see sub-orders of PAID orders** — unpaid reservations are not
+    actionable and would confuse fulfilment.
+41. **Cancelling a paid sub-order (customer or vendor) auto-refunds it** through the
+    payment provider and records an auto-approved `RefundRequest` for the audit trail. If
+    the gateway call fails, the request stays `REQUESTED` with a note so an admin can
+    retry it.
+42. **After shipping, customers request refunds instead of cancelling.** Requests are
+    allowed for SHIPPED/DELIVERED sub-orders, within `RETURN_WINDOW_DAYS` (default 7) of
+    delivery, one open request at a time, and are decided by an admin.
+43. **Vendors mark orders DELIVERED** (no carrier integration in scope).

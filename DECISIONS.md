@@ -64,3 +64,25 @@ Newest entries are appended at the bottom of each section.
     configured (`CLIENT_URL`, comma-separated) for split deployments.
 16. **Rate limiting** applies to `/api/auth/register|login|refresh` (default 20 requests /
     15 min / IP). The limit is raised in the test environment.
+
+## Catalog & vendors
+
+17. **Brand name "Bazaar"** for the demo storefront.
+18. **Vendor products are soft-deleted when they appear in past orders** (set
+    `isActive=false`) so order history keeps its foreign keys and snapshots; products
+    never ordered are hard-deleted along with their image files.
+19. **Ownership checks return 404, not 403**, for another vendor's product, so vendors
+    can't probe which product IDs exist.
+20. **Product slugs get a short random suffix** (`handwoven-basket-3fa9c1`) because titles
+    aren't unique across vendors; category and store slugs are plain and unique.
+21. **Catalog search** uses case-insensitive `contains` over title, description,
+    category name and store name. For large catalogs this should move to Postgres
+    full-text search (`tsvector` + GIN index) — noted as a next step.
+22. **Catalog filter state lives in the URL** (`?category=&sort=&page=`) so results are
+    shareable and work with the back button.
+23. **Image uploads** use multer memory storage → `StorageService.save()`. Only
+    JPEG/PNG/WebP/GIF up to `MAX_UPLOAD_MB` (5 MB), max 8 per product. Local files are
+    served from `/uploads` with a long cache. A Cloudinary/S3 adapter only needs to
+    implement `save()` and `remove()`.
+24. **Rejected vendors can re-apply**; the application flips back to `PENDING` and the
+    rejection reason is cleared.

@@ -3,7 +3,7 @@ import request from 'supertest';
 import type { Role } from '@prisma/client';
 import { createApp } from '../src/app.js';
 import { prisma } from '../src/lib/prisma.js';
-import { uniqueSlug } from '../src/lib/slug.js';
+import { slugify, uniqueSlug } from '../src/lib/slug.js';
 import { signAccessToken } from '../src/modules/auth/tokens.js';
 
 export const app = createApp();
@@ -33,7 +33,7 @@ export async function createVendor(status: 'APPROVED' | 'PENDING' | 'REJECTED' =
 }
 
 export async function createCategory(name = `Category ${next()}`) {
-  return prisma.category.create({ data: { name, slug: uniqueSlug(name) } });
+  return prisma.category.create({ data: { name, slug: slugify(name) } });
 }
 
 export async function createProduct(vendorId: string, data: { price?: number; stock?: number; categoryId?: string; title?: string } = {}) {

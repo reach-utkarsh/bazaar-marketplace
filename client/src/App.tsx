@@ -1,17 +1,42 @@
-import { Route, Routes } from 'react-router';
+import { Navigate, Route, Routes } from 'react-router';
+import ProtectedRoute from './auth/ProtectedRoute';
 import { Layout } from './components/layout/Layout';
+import SellPage from './pages/account/SellPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import HomePage from './pages/shop/HomePage';
+import ProductDetailPage from './pages/shop/ProductDetailPage';
+import StorePage from './pages/shop/StorePage';
+import ProductFormPage from './pages/vendor/ProductFormPage';
+import VendorLayout from './pages/vendor/VendorLayout';
+import VendorProductsPage from './pages/vendor/VendorProductsPage';
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
+        <Route path="products/:slug" element={<ProductDetailPage />} />
+        <Route path="stores/:slug" element={<StorePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="sell" element={<SellPage />} />
+
+        <Route
+          path="vendor"
+          element={
+            <ProtectedRoute approvedVendor>
+              <VendorLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="products" replace />} />
+          <Route path="products" element={<VendorProductsPage />} />
+          <Route path="products/new" element={<ProductFormPage />} />
+          <Route path="products/:id" element={<ProductFormPage />} />
+        </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

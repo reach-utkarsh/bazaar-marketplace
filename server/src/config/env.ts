@@ -1,4 +1,6 @@
 import 'dotenv/config';
+import os from 'node:os';
+import path from 'node:path';
 import { z } from 'zod';
 
 const isTest = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true';
@@ -41,6 +43,7 @@ if (isTest) {
   raw.BCRYPT_ROUNDS ??= '4';
   raw.AUTH_RATE_LIMIT_MAX = process.env.TEST_AUTH_RATE_LIMIT_MAX ?? '100000';
   raw.JWT_ACCESS_SECRET ??= 'test-access-secret-that-is-long-enough-123456';
+  raw.UPLOAD_DIR = path.join(os.tmpdir(), 'marketplace-test-uploads');
   // Force the mock provider in tests so no network calls are made.
   raw.RAZORPAY_KEY_ID = '';
   raw.RAZORPAY_KEY_SECRET = '';

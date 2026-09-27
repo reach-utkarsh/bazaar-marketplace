@@ -239,12 +239,12 @@ Every endpoint validates `params`/`query`/`body` with Zod.
 - [x] Tests: auth flow (server), ProtectedRoute (client); lint + type-check
 
 ### Phase 2 — Catalog & vendor products
-- [ ] Categories (public list + admin CRUD)
-- [ ] Vendor application + status
-- [ ] Vendor product CRUD, image upload via storage interface (local disk)
-- [ ] Public catalog: search, category filter, price sort, pagination; product detail
-- [ ] Client: catalog, product detail, vendor apply, vendor product management
-- [ ] Tests
+- [x] Categories (public list + admin CRUD)
+- [x] Vendor application + status
+- [x] Vendor product CRUD, image upload via storage interface (local disk)
+- [x] Public catalog: search, category filter, price sort, pagination; product detail
+- [x] Client: catalog, product detail, vendor apply, vendor product management
+- [x] Tests
 
 ### Phase 3 — Cart, checkout & payments
 - [ ] Cart API (multi-vendor), client cart page

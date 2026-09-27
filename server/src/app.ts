@@ -5,7 +5,12 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { allowedOrigins, isTestEnv } from './config/env.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
+import { adminRouter } from './modules/admin/admin.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
+import { categoriesRouter } from './modules/categories/categories.routes.js';
+import { productsRouter } from './modules/products/products.routes.js';
+import { vendorRouter } from './modules/vendor/vendor.routes.js';
+import { vendorsRouter } from './modules/vendors/vendors.routes.js';
 import { uploadDir } from './services/storage/storage.service.js';
 
 export function createApp() {
@@ -49,6 +54,11 @@ export function createApp() {
     res.json({ status: 'ok', time: new Date().toISOString() });
   });
   api.use('/auth', authRouter);
+  api.use('/categories', categoriesRouter);
+  api.use('/products', productsRouter);
+  api.use('/vendors', vendorsRouter);
+  api.use('/vendor', vendorRouter);
+  api.use('/admin', adminRouter);
 
   app.use('/api', api);
   app.use(notFoundHandler);

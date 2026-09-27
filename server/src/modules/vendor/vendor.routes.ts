@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticate, requireApprovedVendor } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { vendorProductsRouter } from '../products/products.routes.js';
+import * as dashboard from './vendorDashboard.controller.js';
 import * as orders from './vendorOrders.controller.js';
 import { getVendorOrderSchema, listVendorOrdersSchema, updateVendorOrderStatusSchema } from './vendorOrders.schemas.js';
 
@@ -12,3 +13,5 @@ vendorRouter.use('/products', vendorProductsRouter);
 vendorRouter.get('/orders', validate(listVendorOrdersSchema), orders.list);
 vendorRouter.get('/orders/:id', validate(getVendorOrderSchema), orders.get);
 vendorRouter.patch('/orders/:id/status', validate(updateVendorOrderStatusSchema), orders.updateStatus);
+vendorRouter.get('/analytics', validate(dashboard.analyticsSchema), dashboard.analytics);
+vendorRouter.get('/payouts', validate(dashboard.payoutsSchema), dashboard.payouts);

@@ -263,12 +263,12 @@ Every endpoint validates `params`/`query`/`body` with Zod.
 - [x] Tests
 
 ### Phase 5 — Admin, commission & payouts
-- [ ] Admin: vendor approval, categories, all orders, commission setting
-- [ ] Platform dashboard (GMV, commission, daily chart, top vendors)
-- [ ] Vendor analytics (daily sales, top products, pending orders) + payout summary
-- [ ] Payout generation & mark-paid; refund request handling
-- [ ] Client admin panel + vendor dashboard charts
-- [ ] Tests
+- [x] Admin: vendor approval, categories, all orders, commission setting
+- [x] Platform dashboard (GMV, commission, daily chart, top vendors)
+- [x] Vendor analytics (daily sales, top products, pending orders) + payout summary
+- [x] Payout generation & mark-paid; refund request handling
+- [x] Client admin panel + vendor dashboard charts
+- [x] Tests
 
 ### Phase 6 — Reviews, polish & tests
 - [ ] Reviews (verified buyers only), rating aggregates

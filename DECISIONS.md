@@ -153,3 +153,31 @@ Newest entries are appended at the bottom of each section.
     allowed for SHIPPED/DELIVERED sub-orders, within `RETURN_WINDOW_DAYS` (default 7) of
     delivery, one open request at a time, and are decided by an admin.
 43. **Vendors mark orders DELIVERED** (no carrier integration in scope).
+
+## Admin, commission & payouts
+
+44. **Commission is stored in basis points** (`Setting` row `commission_rate_bps`, default
+    from `DEFAULT_COMMISSION_BPS`), capped at 50%, and **snapshotted per sub-order** at
+    checkout (`commissionRateBps`, `commissionAmount`, `vendorEarnings`) so rate changes
+    never rewrite history. Commission is rounded to the nearest paisa;
+    `vendorEarnings = subtotal − commission` exactly.
+45. **Payout eligibility:** a sub-order is payable when DELIVERED, past the return window,
+    not refunded, with no open refund request, on a PAID order, and not already in a
+    payout. Tying payouts to the return window means refunds never need to claw money
+    back from vendors.
+46. **Payout generation is idempotent:** it runs in a transaction and claims sub-orders
+    with `payoutId IS NULL` via a conditional update, so re-running (or concurrent runs)
+    can never pay a sub-order twice. Admins then transfer money off-platform and "mark
+    paid" with an optional bank reference (CAS, can't be marked twice).
+47. **Refund approval is CAS-first:** REQUESTED → APPROVED and the `refundedAmount`
+    increment are committed before calling the gateway, so a double-click refunds once;
+    a gateway failure reverts both so the admin can retry.
+48. **Analytics are net of cancellations and refunds** and computed in SQL
+    (`$queryRaw` with `Prisma.sql` parameters, no string interpolation). Daily series are
+    zero-filled server-side so charts have no gaps. Days are UTC.
+49. **Charts:** GMV and commission are two separate single-series charts rather than one
+    dual-axis chart (commission is ~10% of GMV and would be flattened, and dual axes
+    imply false correlations). Single-series charts have no legend (the title names
+    the series), use 2px lines, hairline solid gridlines, a hover crosshair + tooltip,
+    and a "view as table" fallback. Ranked lists use plain HTML bars in one colour.
+    The app ships a light theme only.

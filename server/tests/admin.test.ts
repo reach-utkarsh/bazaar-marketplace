@@ -90,6 +90,18 @@ describe('dashboards', () => {
     expect(res.body.counts.approvedVendors).toBe(2);
   });
 
+  it('handles large order values without integer overflow (regression)', async () => {
+    const admin = await createUser('ADMIN');
+    const v = await vendorWithProduct({ price: 8_999_900, stock: 50 }); // ₹89,999
+    await paidOrder([{ productId: v.product.id, quantity: 5 }]);
+    const res = await api().get('/api/admin/dashboard').set(admin.auth);
+    expect(res.status).toBe(200);
+    expect(res.body.range).toMatchObject({ sales: 44_999_500, commission: 4_499_950 });
+    const vendor = await api().get('/api/vendor/analytics').set(v.auth);
+    expect(vendor.status).toBe(200);
+    expect(vendor.body.allTime.earnings).toBe(40_499_550);
+  });
+
   it('vendor analytics shows own sales, top products and pending orders', async () => {
     const v = await vendorWithProduct({ price: 20_000, stock: 50 });
     const other = await vendorWithProduct({ price: 99_000 });

@@ -181,3 +181,48 @@ Newest entries are appended at the bottom of each section.
     the series), use 2px lines, hairline solid gridlines, a hover crosshair + tooltip,
     and a "view as table" fallback. Ranked lists use plain HTML bars in one colour.
     The app ships a light theme only.
+
+## Reviews, seed & polish
+
+50. **Verified buyer = has a DELIVERED, PAID shipment containing the product.** One review
+    per (product, user); posting again edits it. `avgRating` / `reviewCount` are
+    denormalised on `Product` (for catalog sorting) and recomputed in the same
+    transaction as the write. Reviewer surnames are shortened for privacy ("Priya S.").
+51. **Seed is deterministic and destructive for the dev DB only.** `npm run seed` truncates
+    the development database and rebuilds it with a seeded PRNG, so demo data is identical
+    on every run; it refuses to run with `NODE_ENV=production`.
+52. **Demo product images come from `picsum.photos`** (stable per-product seeds), so the
+    storefront looks realistic without committing binary assets. They are generic
+    photos, not pictures of the actual products, and need internet access. The UI falls
+    back to a placeholder if an image fails. Vendor-uploaded images are stored locally.
+53. **Visual verification.** The Claude-in-Chrome extension was unavailable during the build,
+    so the running app was checked with headless Chrome driven over the DevTools protocol
+    (desktop 1366px and mobile 390px). This caught three bugs the tests had missed, all
+    fixed: (a) an `integer out of range` in the analytics SQL for orders above ~₹2,100
+    (amount × bps overflowed INT; arithmetic is now NUMERIC and a regression test uses
+    large amounts); (b) charts and cards overflowing their CSS grid tracks (grids now
+    use `minmax(0,1fr)`/`grid-cols-1`); (c) no search box on phones.
+54. **Daily sales use bar charts, not smoothed lines.** Daily totals are discrete and often
+    zero; a monotone curve suggested sales between days that didn't exist.
+55. **Route-level code splitting.** Vendor and admin areas (and Recharts) are lazy-loaded,
+    roughly halving the storefront bundle (838 KB → 421 KB before gzip).
+56. **Root `postinstall` runs `prisma generate`** after all workspaces are installed, so a
+    fresh clone works after `npm install`; `npm run setup` also generates the client.
+
+## SQLite fallback
+
+57. Docker was available, so PostgreSQL is used everywhere and **no SQLite fallback was
+    built**. The inventory guarantee relies on Postgres row-level locking and CHECK
+    constraints, and search uses case-insensitive matching that SQLite handles
+    differently. Without Docker, any local PostgreSQL 14+ works (README → "No Docker?").
+
+## Known limitations / next steps
+
+- No shipping/tax calculation; single currency (INR).
+- Payouts are recorded, not transferred (a real system would use RazorpayX / Stripe Connect).
+- Vendors mark orders delivered; there is no carrier tracking integration.
+- Catalog search is `ILIKE`-based; switch to Postgres full-text search (or Meilisearch) at scale.
+- The rate limiter and expiry job are in-process; use Redis-backed limiting and a single
+  scheduled worker when scaling horizontally.
+- Light theme only; no i18n.
+- No end-to-end browser tests in CI yet (Playwright would be the next addition).

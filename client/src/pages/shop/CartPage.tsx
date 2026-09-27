@@ -34,7 +34,7 @@ export default function CartPage() {
   return (
     <>
       <PageHeader title="Your cart" description={`${itemCount} item${itemCount === 1 ? '' : 's'} from ${groups.length} seller${groups.length === 1 ? '' : 's'}`} />
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-4">
           {groups.map((g) => (
             <Card key={g.vendor.id}>

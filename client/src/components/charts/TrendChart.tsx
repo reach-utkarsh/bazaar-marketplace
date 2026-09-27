@@ -1,5 +1,4 @@
-import { useId } from 'react';
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { formatMoney, formatMoneyCompact } from '../../lib/format';
 
 export interface TrendPoint {
@@ -32,23 +31,17 @@ function ChartTooltip({ active, payload, label, valueLabel }: ChartTooltipProps)
 }
 
 /**
- * Single-series money-over-time area chart. One series → no legend (the card title names it);
- * crosshair + tooltip on hover; a data table is available for screen readers and exact values.
+ * Single-series daily money chart. Daily totals are discrete (many days are zero), so bars
+ * are used rather than a smoothed line that would invent values between days. One series →
+ * no legend (the card title names it); hover highlight + tooltip; a table view for exact values.
  */
 export function TrendChart({ data, color = '#4f46e5', valueLabel, height = 260 }: { data: TrendPoint[]; color?: string; valueLabel: string; height?: number }) {
-  const gradientId = useId().replace(/:/g, '');
   const total = data.reduce((s, d) => s + d.value, 0);
   return (
     <figure>
       <div style={{ height }} role="img" aria-label={`${valueLabel} per day, total ${formatMoney(total)}`}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
-            <defs>
-              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={color} stopOpacity={0.18} />
-                <stop offset="100%" stopColor={color} stopOpacity={0} />
-              </linearGradient>
-            </defs>
+          <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }} barCategoryGap={data.length > 45 ? 1 : 2}>
             <CartesianGrid vertical={false} stroke={GRID} strokeWidth={1} />
             <XAxis
               dataKey="date"
@@ -59,17 +52,9 @@ export function TrendChart({ data, color = '#4f46e5', valueLabel, height = 260 }
               minTickGap={24}
             />
             <YAxis tickFormatter={(v) => formatMoneyCompact(v)} tick={{ fontSize: 11, fill: INK_MUTED }} tickLine={false} axisLine={false} width={64} />
-            <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ stroke: '#94a3b8', strokeWidth: 1 }} />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke={color}
-              strokeWidth={2}
-              fill={`url(#${gradientId})`}
-              activeDot={{ r: 4, stroke: '#fff', strokeWidth: 2, fill: color }}
-              isAnimationActive={false}
-            />
-          </AreaChart>
+            <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ fill: '#f1f5f9' }} />
+            <Bar dataKey="value" fill={color} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
+          </BarChart>
         </ResponsiveContainer>
       </div>
       <details className="mt-2 text-xs text-slate-500">

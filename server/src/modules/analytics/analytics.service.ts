@@ -5,9 +5,10 @@ import { LOW_STOCK_THRESHOLD } from '../products/products.service.js';
 import { getCommissionBps } from '../settings/settings.service.js';
 
 // Sales are counted from paid orders, excluding cancelled sub-orders and net of refunds.
-const NET = Prisma.sql`(s."subtotal" - s."refundedAmount")`;
-const NET_EARNINGS = Prisma.sql`ROUND((s."subtotal" - s."refundedAmount") * (10000 - s."commissionRateBps") / 10000.0)`;
-const NET_COMMISSION = Prisma.sql`ROUND((s."subtotal" - s."refundedAmount") * s."commissionRateBps" / 10000.0)`;
+// Arithmetic is done in NUMERIC: amount × bps overflows 32-bit INT for orders above ~₹2,100.
+const NET = Prisma.sql`(s."subtotal" - s."refundedAmount")::numeric`;
+const NET_EARNINGS = Prisma.sql`ROUND((s."subtotal" - s."refundedAmount")::numeric * (10000 - s."commissionRateBps") / 10000)`;
+const NET_COMMISSION = Prisma.sql`ROUND((s."subtotal" - s."refundedAmount")::numeric * s."commissionRateBps" / 10000)`;
 
 interface DayRow {
   day: string;

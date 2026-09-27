@@ -87,13 +87,13 @@ export default function ProductFormPage() {
         <ArrowLeft className="h-4 w-4" /> Back to products
       </Link>
       <PageHeader title={isEdit ? 'Edit product' : 'New product'} />
-      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
         <Card>
           <CardHeader title="Details" />
           <form onSubmit={onSubmit} className="space-y-4 p-5" noValidate>
             <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} error={errors.title} maxLength={120} />
             <Textarea label="Description" rows={6} value={description} onChange={(e) => setDescription(e.target.value)} error={errors.description} maxLength={5000} />
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <Input label="Price (₹)" type="number" min={1} step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} error={errors.price} />
               <Input label="Stock" type="number" min={0} step={1} value={stock} onChange={(e) => setStock(e.target.value)} error={errors.stock} />
               <Select label="Category" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} error={errors.categoryId}>

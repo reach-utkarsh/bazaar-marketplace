@@ -30,7 +30,7 @@ export default function ProductDetailPage() {
         <span className="truncate text-slate-900">{product.title}</span>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div>
           <div className="aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <ProductImage url={images[active]?.url} alt={product.title} className="h-full w-full" />

@@ -36,7 +36,7 @@ export function StatCard({ label, value, hint, icon }: { label: string; value: R
         <p className="text-sm font-medium text-slate-500">{label}</p>
         {icon && <span className="text-slate-400">{icon}</span>}
       </div>
-      <p className="mt-2 text-2xl font-semibold tabular-nums text-slate-900">{value}</p>
+      <p className="mt-2 text-lg font-semibold break-words text-slate-900 tabular-nums sm:text-2xl">{value}</p>
       {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
     </Card>
   );

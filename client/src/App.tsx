@@ -1,13 +1,6 @@
+import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router';
 import ProtectedRoute from './auth/ProtectedRoute';
-import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
-import AdminLayout from './pages/admin/AdminLayout';
-import AdminOrdersPage from './pages/admin/AdminOrdersPage';
-import AdminPayoutsPage from './pages/admin/AdminPayoutsPage';
-import AdminRefundsPage from './pages/admin/AdminRefundsPage';
-import AdminSettingsPage from './pages/admin/AdminSettingsPage';
-import AdminVendorsPage from './pages/admin/AdminVendorsPage';
 import { Layout } from './components/layout/Layout';
 import OrderDetailPage from './pages/account/OrderDetailPage';
 import OrdersPage from './pages/account/OrdersPage';
@@ -20,16 +13,28 @@ import CheckoutPage from './pages/shop/CheckoutPage';
 import HomePage from './pages/shop/HomePage';
 import ProductDetailPage from './pages/shop/ProductDetailPage';
 import StorePage from './pages/shop/StorePage';
-import ProductFormPage from './pages/vendor/ProductFormPage';
-import VendorLayout from './pages/vendor/VendorLayout';
-import VendorOrdersPage from './pages/vendor/VendorOrdersPage';
-import VendorOverviewPage from './pages/vendor/VendorOverviewPage';
-import VendorPayoutsPage from './pages/vendor/VendorPayoutsPage';
-import VendorProductsPage from './pages/vendor/VendorProductsPage';
+import { PageLoader } from './components/ui/Spinner';
+
+// Vendor and admin areas (and Recharts) are split into their own chunks.
+const AdminCategoriesPage = lazy(() => import('./pages/admin/AdminCategoriesPage'));
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
+const AdminOrdersPage = lazy(() => import('./pages/admin/AdminOrdersPage'));
+const AdminPayoutsPage = lazy(() => import('./pages/admin/AdminPayoutsPage'));
+const AdminRefundsPage = lazy(() => import('./pages/admin/AdminRefundsPage'));
+const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'));
+const AdminVendorsPage = lazy(() => import('./pages/admin/AdminVendorsPage'));
+const ProductFormPage = lazy(() => import('./pages/vendor/ProductFormPage'));
+const VendorLayout = lazy(() => import('./pages/vendor/VendorLayout'));
+const VendorOrdersPage = lazy(() => import('./pages/vendor/VendorOrdersPage'));
+const VendorOverviewPage = lazy(() => import('./pages/vendor/VendorOverviewPage'));
+const VendorPayoutsPage = lazy(() => import('./pages/vendor/VendorPayoutsPage'));
+const VendorProductsPage = lazy(() => import('./pages/vendor/VendorProductsPage'));
 
 export default function App() {
   return (
-    <Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="products/:slug" element={<ProductDetailPage />} />
@@ -77,6 +82,7 @@ export default function App() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>
-    </Routes>
+      </Routes>
+    </Suspense>
   );
 }

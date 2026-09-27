@@ -14,11 +14,12 @@
     "build": "npm run build -w server && npm run build -w client",
     "seed": "npm run seed -w server",
     "migrate": "npm run db:migrate -w server",
-    "setup": "npm run db:migrate -w server && npm run seed -w server",
+    "setup": "npm run db:generate -w server && npm run db:migrate -w server && npm run seed -w server",
     "test": "npm run test -w server && npm run test -w client",
     "lint": "npm run lint -w server && npm run lint -w client",
     "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
-    "check": "npm run typecheck && npm run lint && npm run test"
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "postinstall": "npm run db:generate -w server"
   },
   "devDependencies": {
     "concurrently": "^9.2.4"

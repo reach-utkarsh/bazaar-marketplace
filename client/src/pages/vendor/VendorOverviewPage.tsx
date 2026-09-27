@@ -32,8 +32,8 @@ export default function VendorOverviewPage() {
             <StatCard label="All-time earnings" value={formatMoney(q.data.allTime.earnings)} hint={`${q.data.allTime.orders} orders`} icon={<IndianRupee className="h-4 w-4" />} />
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-3">
-            <Card className="xl:col-span-2">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <Card className="min-w-0 xl:col-span-2">
               <CardHeader title="Daily sales" description={`Net of cancellations and refunds · last ${days} days`} />
               <div className="p-4">
                 <TrendChart data={q.data.daily.map((d) => ({ date: d.date, value: d.sales }))} valueLabel="Sales" />

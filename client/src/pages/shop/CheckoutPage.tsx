@@ -75,7 +75,7 @@ export default function CheckoutPage() {
   return (
     <>
       <PageHeader title="Checkout" description="Your items will ship separately from each seller." />
-      <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-[1fr_360px]" noValidate>
+      <form onSubmit={onSubmit} className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]" noValidate>
         <Card>
           <CardHeader title="Shipping address" />
           <div className="grid gap-4 p-5 sm:grid-cols-2">

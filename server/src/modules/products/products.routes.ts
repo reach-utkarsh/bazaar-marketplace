@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { imageUpload } from '../../middleware/upload.js';
 import { validate } from '../../middleware/validate.js';
+import { reviewsRouter } from '../reviews/reviews.routes.js';
 import * as ctrl from './products.controller.js';
 import {
   createProductSchema,
@@ -17,6 +18,7 @@ import {
 export const productsRouter = Router();
 productsRouter.get('/', validate(listProductsSchema), ctrl.list);
 productsRouter.get('/:slug', validate(productBySlugSchema), ctrl.bySlug);
+productsRouter.use('/:id/reviews', reviewsRouter);
 
 /** Mounted under /vendor/products (auth + approved-vendor applied by the vendor router). */
 export const vendorProductsRouter = Router();

@@ -101,8 +101,8 @@ function VendorOrderCard({ sub }: { sub: VendorSubOrder }) {
       {open && (
         <div className="space-y-4 border-t border-slate-100 px-5 py-4">
           <ShipmentProgress subOrder={sub} paid />
-          <div className="grid gap-4 md:grid-cols-2">
-            <ul className="space-y-1 text-sm">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <ul className="min-w-0 space-y-1 text-sm">
               {sub.items.map((i) => (
                 <li key={i.id} className="flex justify-between gap-2">
                   <span className="truncate text-slate-700">{i.quantity} × {i.productTitle}</span>

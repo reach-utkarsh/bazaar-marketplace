@@ -116,7 +116,7 @@ export function CatalogBrowser({ vendor }: { vendor?: string }) {
   );
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
       <aside className={clsx(filtersOpen ? 'block' : 'hidden', 'lg:block')} aria-label="Filters">
         {filters}
       </aside>

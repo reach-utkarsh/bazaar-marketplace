@@ -200,6 +200,7 @@ Every endpoint validates `params`/`query`/`body` with Zod.
 | | `GET /products/:id/reviews?page` | public |
 | | `POST /products/:id/reviews` | CUSTOMER (verified buyer) |
 | | `GET /products/:id/reviews/eligibility` | authed |
+| | *(POST creates or updates the caller's single review)* | |
 | Vendors | `POST /vendors/apply` | CUSTOMER |
 | | `GET /vendors/me` | authed |
 | | `GET /vendors/:slug` | public (approved store page) |
@@ -208,6 +209,7 @@ Every endpoint validates `params`/`query`/`body` with Zod.
 | Vendor orders | `GET /vendor/orders?status&page`, `GET /vendor/orders/:id`, `PATCH /vendor/orders/:id/status` | VENDOR |
 | Vendor analytics | `GET /vendor/analytics?days=30` | VENDOR |
 | Vendor payouts | `GET /vendor/payouts` | VENDOR |
+| Admin dashboard | `GET /admin/dashboard?days=` | ADMIN |
 | Cart | `GET /cart`, `POST /cart/items`, `PATCH /cart/items/:productId`, `DELETE /cart/items/:productId`, `DELETE /cart` | CUSTOMER |
 | Checkout | `POST /orders/checkout` → creates Order+SubOrders, reserves stock, creates payment order | CUSTOMER |
 | Orders | `GET /orders`, `GET /orders/:id` | CUSTOMER (own) |
@@ -271,8 +273,8 @@ Every endpoint validates `params`/`query`/`body` with Zod.
 - [x] Tests
 
 ### Phase 6 — Reviews, polish & tests
-- [ ] Reviews (verified buyers only), rating aggregates
-- [ ] Seed script with realistic demo data
-- [ ] UI polish: loading/empty/error states, responsive layout
-- [ ] README (features, Mermaid architecture, setup, credentials), DECISIONS.md
-- [ ] Final full lint/type-check/test pass
+- [x] Reviews (verified buyers only), rating aggregates
+- [x] Seed script with realistic demo data
+- [x] UI polish: loading/empty/error states, responsive layout
+- [x] README (features, Mermaid architecture, setup, credentials), DECISIONS.md
+- [x] Final full lint/type-check/test pass

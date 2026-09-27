@@ -40,14 +40,14 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          <div className="grid gap-6 xl:grid-cols-2">
-            <Card>
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <Card className="min-w-0">
               <CardHeader title="Daily GMV" description={`Gross merchandise value · last ${days} days`} />
               <div className="p-4">
                 <TrendChart data={q.data.daily.map((d) => ({ date: d.date, value: d.sales }))} valueLabel="GMV" />
               </div>
             </Card>
-            <Card>
+            <Card className="min-w-0">
               <CardHeader title="Daily commission" description={`Platform revenue · last ${days} days`} />
               <div className="p-4">
                 <TrendChart data={q.data.daily.map((d) => ({ date: d.date, value: d.commission }))} valueLabel="Commission" color="#0d9488" />
@@ -55,7 +55,7 @@ export default function AdminDashboardPage() {
             </Card>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
             <Card>
               <CardHeader title="Top vendors" description={`By GMV · last ${days} days`} />
               <div className="p-5">

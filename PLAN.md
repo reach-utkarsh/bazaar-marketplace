@@ -213,11 +213,12 @@ Every endpoint validates `params`/`query`/`body` with Zod.
 | Orders | `GET /orders`, `GET /orders/:id` | CUSTOMER (own) |
 | | `POST /orders/:id/sub-orders/:subOrderId/cancel` | CUSTOMER (own) |
 | | `POST /orders/:id/cancel` (only while payment pending) | CUSTOMER |
+| | `POST /orders/:id/payment` (resume/retry payment for a pending order) | CUSTOMER |
 | | `POST /orders/:id/sub-orders/:subOrderId/refund-requests` | CUSTOMER |
 | Payments | `GET /payments/config` (provider + public key) | public |
 | | `POST /payments/verify` | CUSTOMER |
-| | `POST /payments/webhook/razorpay` (raw body, HMAC) | provider |
-| | `POST /payments/mock/:providerOrderId/pay` (mock gateway only) | CUSTOMER |
+| | `POST /payments/webhook` (raw body, HMAC `x-razorpay-signature`) | gateway |
+| | `POST /payments/mock/pay` `{orderId, outcome}` (mock gateway only) | CUSTOMER |
 | Admin | `GET /admin/dashboard?days=30` | ADMIN |
 | | `GET /admin/vendors?status`, `POST /admin/vendors/:id/approve`, `POST /admin/vendors/:id/reject` | ADMIN |
 | | `GET /admin/orders?paymentStatus&page`, `GET /admin/orders/:id` | ADMIN |
@@ -247,12 +248,12 @@ Every endpoint validates `params`/`query`/`body` with Zod.
 - [x] Tests
 
 ### Phase 3 — Cart, checkout & payments
-- [ ] Cart API (multi-vendor), client cart page
-- [ ] Checkout: address, order split per vendor, stock reservation
-- [ ] Payment provider interface: Razorpay (test mode) + Mock provider
-- [ ] Signature verification, idempotent webhooks (captured / failed), stale-order expiry
-- [ ] Client checkout + Razorpay Checkout / mock payment dialog
-- [ ] Tests (signature, webhook idempotency, checkout)
+- [x] Cart API (multi-vendor), client cart page
+- [x] Checkout: address, order split per vendor, stock reservation
+- [x] Payment provider interface: Razorpay (test mode) + Mock provider
+- [x] Signature verification, idempotent webhooks (captured / failed), stale-order expiry
+- [x] Client checkout + Razorpay Checkout / mock payment dialog
+- [x] Tests (signature, webhook idempotency, checkout)
 
 ### Phase 4 — Orders, sub-orders & inventory
 - [ ] Customer order history + detail with per-sub-order tracking timeline

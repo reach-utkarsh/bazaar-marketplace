@@ -166,7 +166,7 @@ export interface Order extends Address {
   createdAt: string;
   subOrders: SubOrder[];
   customer?: { id: string; name: string; email: string };
-  payment?: { provider: 'RAZORPAY' | 'MOCK'; status: string; providerOrderId: string } | null;
+  payment?: { provider: 'RAZORPAY' | 'MOCK'; status: string; providerOrderId: string; failureReason: string | null } | null;
 }
 
 export interface PaymentInit {

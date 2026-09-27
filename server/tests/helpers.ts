@@ -44,3 +44,23 @@ export async function createProduct(vendorId: string, data: { price?: number; st
       price: data.price ?? 10_000, stock: data.stock ?? 10 },
   });
 }
+
+export const ADDRESS = {
+  shippingName: 'Asha Rao',
+  shippingPhone: '+91 98765 43210',
+  shippingLine1: '12 MG Road',
+  shippingCity: 'Bengaluru',
+  shippingState: 'Karnataka',
+  shippingPostalCode: '560001',
+  shippingCountry: 'India',
+};
+
+export async function addToCart(auth: Record<string, string>, productId: string, quantity = 1) {
+  const res = await api().post('/api/cart/items').set(auth).send({ productId, quantity });
+  if (res.status !== 201) throw new Error(`addToCart failed: ${res.status} ${JSON.stringify(res.body)}`);
+  return res.body;
+}
+
+export async function checkout(auth: Record<string, string>) {
+  return api().post('/api/orders/checkout').set(auth).send({ address: ADDRESS });
+}
